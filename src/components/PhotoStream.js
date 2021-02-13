@@ -11,6 +11,7 @@ const blank = { query: ''}
 const [query, setQuery] = useState(blank)
 const [photos, setPhotos] = useState([])
 
+
 const handleInputChange = (event) => {
     const {name, value} = event.target
 
@@ -18,40 +19,28 @@ const handleInputChange = (event) => {
 }
 
 
-const handleSubmit = async e => {
+const handleSubmit = e => {
     e.preventDefault()
     console.log("Your query: ", query.query)
 
+
     var key = process.env.REACT_APP_FLICKR_KEY
-    var flickrApi = ` https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${key}&tags=${query}&format=json&nojsoncallback=1`
+    var flickrApi = ` https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${key}&tags=${query.query}&format=json&nojsoncallback=1`
     
-    
+    console.log("I'm the api", flickrApi)
    fetch(flickrApi)
-   .then(response => {
-     return response.json()
+   .then((res) => {
+       return res.json()
    })
-   .then(
-       photoData => {
-           let photos = photoData.photos.photo.map((pic) => {
-               return (
-                   <img key={pic.id} src={pic.url_o || `https://forums.codemasters.com/uploads/monthly_2020_03/image.png.f8c83b98a2250b117a112bcfb92ca287.png`} alt={pic.title}/>
-               )
-           })
-
-           setPhotos(...photos)
-       }
-   )
-    
-    // .then(photoStuffs => {
-    //     let photoList = photoStuffs.photos.photo.map((pic) => {
-    //         return (
-    //             <img key={pic.id} src={pic.ur._o || `https://forums.codemasters.com/uploads/monthly_2020_03/image.png.f8c83b98a2250b117a112bcfb92ca287.png`}   alt={pic.title}/>
-    //         )
-    //     })
-
-    //     setPhotos(...photoList)
-    // })
+   .then((data => {
+       setPhotos(data)
+   }))
 }
+
+
+const photoList = query.query && photos.photos.photo.map((pic) => {
+    return <img key={pic.id} src={`https://live.staticflickr.com/${pic.server}/${pic.id}_${pic.secret}_w.jpg` || `https://forums.codemasters.com/uploads/monthly_2020_03/image.png.f8c83b98a2250b117a112bcfb92ca287.png`} alt={pic.title}/>
+}) 
 
 
     return (
@@ -65,7 +54,7 @@ const handleSubmit = async e => {
       onChange={handleInputChange} />
       <button>Get photos!</button>
       </form>
-      {photos}
+     {photoList}
         </div>
     )
 }
